@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SurePay — DBS DCTA concept</title>
+  <link rel="stylesheet" href="styles.css?v=20261004.1">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand"><span class="mark">S</span><span>SurePay</span></div>
+      <div class="sim"><i></i> Safe simulation · build 20261004.1</div>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">DIRECT CONVERSATIONAL TRANSACTION AGENT</p>
+      <h1>Say it naturally.<br><em>Approve it deliberately.</em></h1>
+      <p class="lede">Speak naturally. A separate validator checks every action before a transaction-bound approval can unlock simulated execution.</p>
+      <div class="principles">
+        <span>01&nbsp; Understand</span><b>→</b><span>02&nbsp; Verify</span><b>→</b><span>03&nbsp; Authorize</span>
+      </div>
+    </section>
+
+    <section class="phone" aria-label="SurePay conversation demo">
+      <div class="phone-head">
+        <div><small>Good afternoon</small><strong>How can I help?</strong></div>
+        <div class="shield">✓</div>
+      </div>
+      <div id="messages" class="messages" aria-live="polite">
+        <div class="bubble agent">Tell me what you'd like to do. You can combine transfers, bills, and investments—I’ll resolve ambiguity before creating a draft.</div>
+        <div class="quick">
+          <button data-action="multi-intent" type="button">Build multi-intent</button>
+          <button data-action="add-recipient" type="button">Add recipient</button>
+          <button data-action="show-balance" type="button">Show balance</button>
+          <button data-action="test-injection" type="button">Test injection</button>
+        </div>
+      </div>
+      <form id="composer">
+        <label class="sr-only" for="prompt">Transaction request</label>
+        <button id="mic" class="mic" type="button" aria-label="Speak transaction">◉</button>
+        <label class="sr-only" for="paymentSource">Account for payments</label>
+        <select id="paymentSource" aria-label="Account for payments"><option value="savings">Savings · 2481</option><option value="current">Current · 9032</option><option value="joint">Joint · 7714</option></select>
+        <input id="prompt" maxlength="500" autocomplete="off" placeholder="Speak or type a transaction…">
+        <button class="send" aria-label="Send">↑</button>
+      </form>
+    </section>
+
+    <dialog id="multiBuilder" class="builder">
+      <form id="multiIntentForm" class="builder-form">
+        <div class="builder-head">
+          <div><small>MULTI-INTENT BUILDER</small><h2>Transfer and invest</h2></div>
+          <button id="closeBuilder" class="close" type="button" aria-label="Close">×</button>
+        </div>
+        <p>Configure both actions. You will review and approve them together as one signed batch.</p>
+        <fieldset>
+          <legend><span>1</span> Send money</legend>
+          <label>Exact amount in SGD (0 to skip)<input id="transferAmount" type="text" inputmode="decimal" pattern="[0-9]+(?:\.[0-9]{1,2})?" value="80.00" placeholder="0.00" title="Enter an exact amount with no more than two decimal places; enter 0 to skip the transfer" autocomplete="off" required></label>
+          <label>Payee<select id="transferPayee" required></select></label>
+          <label>Pay from<select id="transferSource" required><option value="savings">Savings · 2481</option><option value="current">Current · 9032</option><option value="joint">Joint Account · 7714</option></select></label>
+        </fieldset>
+        <fieldset>
+          <legend><span>2</span> Buy shares</legend>
+          <label>Company<select id="investmentAsset" required><option value="Apple">Apple · AAPL</option><option value="DBS">DBS · D05.SI</option><option value="Tesla">Tesla · TSLA</option></select></label>
+          <label>Number of shares (0 to skip)<input id="shareQuantity" type="number" min="0" step="1" value="2" required></label>
+        </fieldset>
+        <div id="batchPreview" class="batch-preview"></div>
+        <button class="build" type="submit">Create secure batch →</button>
+      </form>
+    </dialog>
+
+    <dialog id="recipientBuilder" class="builder recipient-builder">
+      <form id="recipientForm" class="builder-form">
+        <div class="builder-head">
+          <div><small>PAYEE DIRECTORY</small><h2>Add a recipient</h2></div>
+          <button id="closeRecipientBuilder" class="close" type="button" aria-label="Close">×</button>
+        </div>
+        <p>Add a mock verified payee. Only the bank and final four account digits are stored in this prototype.</p>
+        <fieldset>
+          <legend><span>1</span> Recipient details</legend>
+          <label>Full name<input id="recipientName" maxlength="50" placeholder="e.g. Priya Sharma" required></label>
+          <label>Bank<select id="recipientBank" required><option>DBS</option><option>POSB</option><option>OCBC</option><option>UOB</option><option>Standard Chartered</option></select></label>
+          <label>Account ending<input id="recipientLast4" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="1234" required></label>
+        </fieldset>
+        <div id="recipientStatus" class="recipient-status">The new payee becomes available in chat and the multi-intent builder.</div>
+        <button class="build" type="submit">Verify and add recipient →</button>
+      </form>
+    </dialog>
+
+    <dialog id="sessionBuilder" class="builder security-builder">
+      <form id="sessionForm" class="builder-form">
+        <div class="builder-head"><div><small>SECURE SESSION</small><h2>Create a demo transaction PIN</h2></div></div>
+        <p>This six-digit PIN protects balance enquiries and payments of SGD 10,000 or more. Mock KYC verification is also required before creating transaction drafts. Do not use a real banking PIN.</p>
+        <fieldset>
+          <legend><span>1</span> Session protection</legend>
+          <label>Six-digit demo PIN<input id="sessionPin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="new-password" required></label>
+          <label>Confirm demo PIN<input id="sessionPinConfirm" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="new-password" required></label>
+        </fieldset>
+        <div id="sessionStatus" class="recipient-status">The PIN is salted, hashed, kept in memory, and never sent to the conversational agent.</div>
+        <button class="build" type="submit">Start secure session →</button>
+      </form>
+    </dialog>
+
+    <dialog id="kycBuilder" class="builder security-builder">
+      <form id="kycForm" class="builder-form">
+        <div class="builder-head"><div><small>MOCK CUSTOMER VERIFICATION</small><h2>Verify demo identity</h2></div></div>
+        <p>Enter the simulation reference shown here. This is not a real identity document or personal identifier. Verification is checked by the server and is required before any transaction draft.</p>
+        <fieldset>
+          <legend><span>2</span> Demo KYC</legend>
+          <label>Demo customer reference<input id="kycReference" autocomplete="off" required></label>
+          <small>Demo reference: <code>SUREPAY-DEMO-2026</code></small>
+        </fieldset>
+        <div id="kycStatus" class="recipient-status">KYC status: pending. Transaction requests remain blocked until server verification succeeds.</div>
+        <button class="build" type="submit">Verify demo identity →</button>
+      </form>
+    </dialog>
+
+    <dialog id="stepUpBuilder" class="builder security-builder">
+      <form id="stepUpForm" class="builder-form">
+        <div class="builder-head">
+          <div><small>HIGH-VALUE PAYMENT</small><h2>Transaction PIN required</h2></div>
+          <button id="cancelStepUp" class="close" type="button" aria-label="Cancel">×</button>
+        </div>
+        <p>Biometric verification passed. Enter the session PIN to authorize this exact signed transaction.</p>
+        <fieldset>
+          <legend><span>2</span> Step-up verification</legend>
+          <label>Six-digit transaction PIN<input id="stepUpPin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="off" required></label>
+          <label id="outOfBandLabel" class="check-label"><input id="outOfBandConfirmation" type="checkbox"> I approved this on my registered device (simulation)</label>
+        </fieldset>
+        <div id="stepUpStatus" class="recipient-status">Three incorrect attempts temporarily lock PIN verification.</div>
+        <button class="build" type="submit">Verify PIN and approve →</button>
+      </form>
+    </dialog>
+
+    <dialog id="balanceBuilder" class="builder security-builder">
+      <form id="balanceForm" class="builder-form">
+        <div class="builder-head">
+          <div><small>PROTECTED INFORMATION</small><h2>Verify to view balance</h2></div>
+          <button id="cancelBalance" class="close" type="button" aria-label="Cancel">×</button>
+        </div>
+        <p>Enter the session PIN. It is sent only to the deterministic security service, never to the conversational agent.</p>
+        <fieldset>
+          <legend><span>1</span> PIN verification</legend>
+          <label>Six-digit session PIN<input id="balancePin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="off" required></label>
+        </fieldset>
+        <div id="balanceStatus" class="recipient-status">Three incorrect attempts temporarily lock PIN-protected operations.</div>
+        <button class="build" type="submit">Verify and show balance →</button>
+      </form>
+    </dialog>
+
+    <p class="disclaimer">Prototype only · No real banking connection · No funds are moved</p>
+  </main>
+  <script src="app.js?v=20261004.1"></script>
+</body>
+</html>

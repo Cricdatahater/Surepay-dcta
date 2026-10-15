@@ -6,13 +6,78 @@ probabilistic conversation and deterministic banking controls. The current demo
 build is `20261004.1`.
 
 Submission copy is available in [docs/SUBMISSION_DESCRIPTION.md](docs/SUBMISSION_DESCRIPTION.md).
-The current public preview is https://excerpt-graphical-minor-instructors.trycloudflare.com.
-It requires the local computer, Python server, and tunnel to remain running.
-See [docs/PUBLIC_DEMO.md](docs/PUBLIC_DEMO.md) for availability and restart instructions;
-use a stable hosted link for unattended judging.
+The public judging demo is **[SurePay on Render](https://surepay-dcta-1.onrender.com/)**.
+It is hosted independently of the developer's computer. The previous temporary
+Cloudflare address is no longer the submission link. The tunnel instructions in
+[docs/PUBLIC_DEMO.md](docs/PUBLIC_DEMO.md) describe the earlier preview only.
 
 This is a simulation. It does not connect to DBS, move real funds, buy real
 shares, or perform genuine biometric verification.
+
+## Judges: start here
+
+1. Open <https://surepay-dcta-1.onrender.com/>. The free Render service sleeps
+   after 15 minutes without traffic; the first visit may take about one minute
+   to wake. Keep the page open while it starts.
+2. Create any six-digit **demo session PIN** and remember it. There is no
+   pre-created bank login. Do not use a real banking PIN or other personal secret.
+3. Complete the mock KYC screen using **`SUREPAY-DEMO-2026`**. No identity
+   documents, real bank credentials, or actual payments are needed.
+4. Try `Send $80 to Maya from my current account and buy 2 Apple shares`.
+   Review the frozen summary, source accounts, quantities, and projected balances
+   before holding the authorization button. Check the receipt after execution.
+5. Use **Show Balance** to demonstrate PIN-protected disclosure. Enter a wrong
+   PIN once, then the correct one; three incorrect attempts trigger a temporary
+   lockout.
+6. Try a **$10,000** transfer to a verified payee to demonstrate payment PIN
+   step-up. An **$8,000** transfer does not require an additional PIN prompt.
+   At **$50,000**, simulated registered-device confirmation is also required.
+7. Use **Build multi-intent**, **Add recipient**, or **Test injection** to
+   explore combined actions, simulated payee registration, and rejection of
+   adversarial requests. Enter a duplicate first name such as `John` to test
+   automatic clarification when multiple matching payees exist.
+
+Payment thresholds apply to the **combined debit of a transaction**, including
+investment purchases, and are prototype policy settings—not official DBS rules.
+All lower-value approvals still require explicit hold-to-authorize and the mock
+transaction signature. Balance queries always require the session PIN.
+
+### What is implemented, and what is simulated
+
+- The public health endpoint is <https://surepay-dcta-1.onrender.com/api/health>.
+  It reports the backend build and configured intent provider.
+- At the 14 October 2026 public check, build `20261004.1` was healthy and used
+  `deterministic_local` extraction. The optional Tencent TokenHub adapter exists,
+  but **Tencent AI was not configured on that deployment**. Do not interpret the
+  default demo as a live LLM integration.
+- PIN verification, transcript/draft comparison, policy checks, authorization
+  expiry, replay protection, and mock balance mutation run on the server.
+- KYC, account balances, stock prices/orders, biometrics, and device confirmation
+  are simulations. The biometric signature is generated server-side for this
+  prototype; it is not Face ID, WebAuthn, or hardware-backed customer signing.
+- Demo balances and velocity limits are shared across visitors, not isolated
+  customer accounts. Sessions, balances, challenges, and audit records are
+  in memory and reset when the server restarts. Added recipients are not durable
+  on Render's free ephemeral filesystem.
+- This is a hackathon demonstration, not a production banking service or a claim
+  of complete regulatory/security compliance. Full customer-to-authorization
+  ownership binding and durable customer-isolated storage remain future work.
+
+### Supporting material
+
+- [Submission description](docs/SUBMISSION_DESCRIPTION.md) — problem, solution,
+  architecture, business value, evaluation, and limitations. Its older preview
+  URL is superseded by the Render link above.
+- [DBS requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md).
+- [Threat model](docs/THREAT_MODEL.md).
+- Automated engine suite: **46 tests passed on 5 October 2026**; this is a dated
+  local regression result, not proof of full browser testing or production safety.
+  Reproduce it with the test command below.
+- CodeBuddy evidence has been recovered by the team and should be supplied in the
+  submission attachments. It is development evidence, not an independent
+  certification that every final feature was implemented or tested in CodeBuddy.
+
+Free-hosting behaviour and limits: [Render documentation](https://render.com/docs/free).
 
 ## Product idea
 
@@ -61,7 +126,9 @@ node --check web/app.js
 
 All balances, transactions, PIN/KYC session state, authorization challenges, and
 audit records are reset when the server restarts. Added recipients are saved in
-`data/recipients.json` and therefore survive a restart.
+`data/recipients.json` and therefore survive a local restart when that file is
+retained. Render Free does not guarantee file persistence across restarts,
+redeploys, or idle spin-down.
 
 ### Optional Tencent TokenHub extraction
 
@@ -315,6 +382,9 @@ fraud scoring, observability, and formal authorization/audit governance.
 
 ## Change log
 
+- 14 October 2026: added judge quick-start instructions, the Render submission
+  URL, mock KYC reference, exact PIN thresholds, deployment/provider status,
+  free-hosting limitations, evidence guidance, and shared-state caveats.
 - Built the initial conversational transfer prototype around the DBS problem
   brief and added voice input, multi-intent parsing, policy checks, and audit.
 - Added deterministic transcript/draft validation and fixed amount-normalization
@@ -364,7 +434,8 @@ fraud scoring, observability, and formal authorization/audit governance.
 
 ## Suggested demo walkthrough
 
-1. Create a demo PIN such as `123456`.
+1. Create a demo PIN such as `123456` and complete mock KYC using
+   `SUREPAY-DEMO-2026`.
 2. Use **Add Recipient** to register a new payee and then send them a small amount.
 3. Use **Multi Intent** to send money and purchase shares in one request.
 4. Complete the hold-to-authorize interaction and show the resulting balances in

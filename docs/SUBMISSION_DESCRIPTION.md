@@ -58,7 +58,7 @@ When TokenHub is configured, the adapter provides a system instruction to extrac
 
 A JSON schema constrains candidate fields such as action kind, amount, recipient, source account, asset, and share quantity. The engine treats the resulting candidates as untrusted input. It resolves identities and validates transcript consistency before offering an authorization draft. An unavailable or invalid model response triggers the local fallback, with the fallback reason recorded in the audit.
 
-The public preview verified on 5 October 2026 uses the deterministic local provider because TokenHub credentials are not configured. Runtime model performance is therefore not claimed for this preview.
+The Render deployment verified on 16 October 2026 uses the deterministic local provider because TokenHub credentials are not configured. Runtime model performance is therefore not claimed for this deployment.
 
 ### Security controls demonstrated
 
@@ -67,7 +67,7 @@ The public preview verified on 5 October 2026 uses the deterministic local provi
 - Amount, beneficiary, action type/count, source account, asset, and quantity are checked against transcript facts where extracted.
 - Explicit approval signs the exact draft using a server-generated mock HMAC proof.
 - Authorizations expire after five minutes and are single-use.
-- Payments of SGD 10,000 or more require PIN step-up; SGD 50,000 or more additionally require simulated device confirmation.
+- Combined transaction debits of SGD 10,000 or more require PIN step-up; SGD 50,000 or more additionally require simulated device confirmation. These totals include investment purchases and are prototype settings, not official DBS thresholds.
 - A batch above SGD 100,000 is blocked, and recent executions are subject to a velocity rule.
 - Stale balance projections block execution; final balance mutation is atomic within the process.
 - Recognized prompt-injection patterns are blocked before drafting.
@@ -76,13 +76,15 @@ The public preview verified on 5 October 2026 uses the deterministic local provi
 
 SurePay moves no real money, executes no real trades, and has no live DBS integration. KYC, account balances, stock prices, recipient verification, device confirmation, and biometric approval are simulations. The hold interaction obtains a server-generated HMAC proof; it is not native FaceID, WebAuthn, or a client hardware-backed signature.
 
-The parser and semantic firewall cover a bounded set of phrases and attacks; arbitrary multilingual and adversarial understanding has not been demonstrated. Browser speech support varies by device. Audit and financial state are in memory; added mock recipients are stored locally. The preview shares one mock account ledger across visitors. Production work would require authenticated customer ownership, durable per-customer storage, full authorization/session binding, bank identity and signing services, and broader security evaluation.
+The parser and semantic firewall cover a bounded set of phrases and attacks; arbitrary multilingual and adversarial understanding has not been demonstrated. Browser speech support varies by device. Audit and financial state are in memory; added mock recipients are stored locally and are not durable on Render Free. The deployment shares one mock account ledger across visitors. Production work would require authenticated customer ownership, durable per-customer storage, full authorization/session binding, bank identity and signing services, and broader security evaluation.
 
 ## Business value and evaluation
 
 The intended impact is fewer navigation steps for combined financial tasks, better visibility of transaction details, and a clear separation between conversational interpretation and execution authority. One request can express a transfer and investment, and one summary exposes both actions for review.
 
-On 5 October 2026, the complete automated suite passed **46 of 46 tests** using `python -m unittest discover -s tests -v` on build `20261004.1`. The run completed in approximately 2.5 seconds. This is test-suite runtime, not customer transaction latency.
+On 16 October 2026, a fresh checkout of GitHub commit `c899f9ee4adfb8852879df3accf3dbbbda2c992c` passed **46 of 46 automated tests** using `python -B -m unittest discover -s tests -v` on build `20261004.1`. The run completed in approximately 2.2 seconds. This is test-suite runtime, not customer transaction latency. The browser JavaScript also passed `node --check web/app.js`.
+
+The live Render deployment returned HTTP 200 and a healthy backend status. **Nine of nine API smoke checks passed**: KYC gating, successful mock KYC, wrong-PIN balance denial, correct-PIN balance disclosure, two-action drafting, duplicate-name clarification, recognized injection rejection, no PIN step-up at SGD 8,000, and PIN step-up at SGD 10,000. Transaction drafts were cancelled; no payments were executed during these live checks. These checks do not replace a full browser interaction test.
 
 The suite covers KYC gating, ambiguous and unknown recipients, transcript mismatches, account selection, protected balance disclosure, PIN step-up, unsigned execution rejection, expired approval, replay rejection, and concurrent approval. In the tested concurrent duplicate-approval case, one request executed and the other was blocked.
 
@@ -96,9 +98,9 @@ The selected Studio screenshots should be described as evidence of that prototyp
 
 ## Demo access and judge walkthrough
 
-Public preview: https://excerpt-graphical-minor-instructors.trycloudflare.com
+Public demo: https://surepay-dcta-1.onrender.com/
 
-This is a temporary HTTPS preview forwarded to the local Python application. It remains available only while the host computer, server, and Cloudflare Tunnel are running. A stable hosted URL is required for reliable unattended judging; recheck availability before entering the submission form.
+This HTTPS deployment runs on Render independently of the developer's computer. Render Free sleeps after 15 minutes without traffic and may take about one minute to wake when opened. In-memory sessions and balances reset when the process restarts, and local file changes are not durable. Recheck availability before entering the submission form.
 
 1. Create any six-digit demo PIN. Use that same PIN for protected actions.
 2. Enter `SUREPAY-DEMO-2026` on the mock KYC screen.
